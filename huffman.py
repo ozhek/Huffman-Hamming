@@ -26,11 +26,11 @@ class Node:
 class Huffman:
 
     def __init__(self):
-        self.heap = []
-        self.root = None
-        self.codes = {}
+        self.__heap = []
+        self.__rootNode = None
+        self.__codes = {}
 
-    def getFreq(self, txt):  # gets probability of each character into Counter object
+    def __getFreq(self, txt):  # gets probability of each character into Counter object
         try:
             prob = Counter()
             siz = len(txt)
@@ -42,42 +42,42 @@ class Huffman:
         except Exception as e:
             print("Unknown error: ", e)
 
-    def makeHeap(self, freq):
+    def __makeHeap(self, freq):
         try:
             for k in freq:
                 node = Node(k, freq[k])
-                heapq.heappush(self.heap, node)
+                heapq.heappush(self.__heap, node)
         except Exception as e:
             print("Unknown error in makeHeap: ", e)
 
-    def makeTree(self):
+    def __makeTree(self):
         try:
-            while len(self.heap) > 1:
-                node1 = heapq.heappop(self.heap)
-                node2 = heapq.heappop(self.heap)
+            while len(self.__heap) > 1:
+                node1 = heapq.heappop(self.__heap)
+                node2 = heapq.heappop(self.__heap)
 
                 merged = Node(None, node1.freq + node2.freq)
                 merged.left = node1
                 merged.right = node2
-                heapq.heappush(self.heap, merged)
+                heapq.heappush(self.__heap, merged)
         except Exception as e:
             print("Unknown error in makeTree: ", e)
 
-    def makeCodes(self, node, cd):
+    def __makeCodes(self, node, cd):
         try:
             if node.char is not None:
-                self.codes[node.char] = cd
+                self.__codes[node.char] = cd
             else:
-                self.makeCodes(node.left, cd + '0')
-                self.makeCodes(node.right, cd + '1')
+                self.__makeCodes(node.left, cd + '0')
+                self.__makeCodes(node.right, cd + '1')
         except Exception as e:
             print("Unknown error on makeCodes", e)
 
-    def writeResult(self, txt):
+    def __writeResult(self, txt):
         try:
             ans = ''
             for i in txt:
-                ans += self.codes[i]
+                ans += self.__codes[i]
 
             print(ans)
             with open('encoded_text.txt', 'w') as fil:
@@ -90,14 +90,14 @@ class Huffman:
         try:
             with open(fileName, 'r') as file:
                 txt = file.read()
-                freq = self.getFreq(txt)
+                freq = self.__getFreq(txt)
 
-            self.makeHeap(freq)
-            self.makeTree()
-            root = heapq.heappop(self.heap)
-            self.root = root
-            self.makeCodes(root, '')
-            self.writeResult(txt)
+            self.__makeHeap(freq)
+            self.__makeTree()
+            root = heapq.heappop(self.__heap)
+            self.__rootNode = root
+            self.__makeCodes(root, '')
+            self.__writeResult(txt)
 
         except Exception as e:
             print("Unknown error: ", e)
@@ -107,7 +107,7 @@ class Huffman:
             with open('encoded_text.txt', 'r') as file:
                 res = ''
                 txt = file.read()
-                root = self.root
+                root = self.__rootNode
                 cur = root
                 for code in txt:
                     if code == '0':
