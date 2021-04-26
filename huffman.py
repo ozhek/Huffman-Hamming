@@ -27,6 +27,7 @@ class Huffman:
 
     def __init__(self):
         self.heap = []
+        self.root = None
         self.codes = {}
 
     def getFreq(self, txt):  # gets probability of each character into Counter object
@@ -77,7 +78,9 @@ class Huffman:
             ans = ''
             for i in txt:
                 ans += self.codes[i]
-            with open('result.txt', 'w') as fil:
+
+            print(ans)
+            with open('encoded_text.txt', 'w') as fil:
                 fil.write(ans)
 
         except Exception as e:
@@ -92,10 +95,38 @@ class Huffman:
             self.makeHeap(freq)
             self.makeTree()
             root = heapq.heappop(self.heap)
+            self.root = root
             self.makeCodes(root, '')
             self.writeResult(txt)
+
         except Exception as e:
             print("Unknown error: ", e)
+
+    def decode(self):
+        try:
+            with open('encoded_text.txt', 'r') as file:
+                res = ''
+                txt = file.read()
+                root = self.root
+                cur = root
+                for code in txt:
+                    if code == '0':
+                        if cur.char is not None:
+                            res += cur.char
+                            cur = root
+                        cur = cur.left
+                    else:
+                        if cur.char is not None:
+                            res += cur.char
+                            cur = root
+                        cur = cur.right
+                res += cur.char
+            print(res)
+            with open('decoded_text.txt', 'w') as file:
+                file.write(res)
+
+        except Exception as e:
+            print('Error in decoding', e)
 
     def printNodes(self):
         try:
