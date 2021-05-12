@@ -1,6 +1,6 @@
 from huffman import Huffman
 
-AssHole = Huffman()
+ah = Huffman()
+ah.encode('hh.txt')
 
-AssHole.encode('hah.txt')
-AssHole.decode()
+# ah.decode()
