@@ -66,25 +66,11 @@ class Huffman:
             c = 0
 
             for parity in range(m+r): #Calculating value of each redunant bit
-
                 p = (2 ** c)
-
                 if (p == (parity + 1)):
-
                     toXor = result[parity+1:parity + p]
-
-                    if len(toXor) == 0:
-                        # print(toXor, end=': 0\n')
-                        c += 1
-                        continue
-
-                    # print(toXor, end=': ')
-                    rs = toXor[0]
-
-                    for z in range(1,len(toXor)):
-                        rs = rs ^ toXor[z]
-                    result[parity] = rs
-                    # print(rs)
+                    if len(toXor) != 0:
+                        result[parity] = toXor[1:].count('1')
                     c += 1
 
             ans = ''.join(map(str, result))
@@ -159,31 +145,82 @@ class Huffman:
     def decode(self):
         try:
             with open('encoded_text.txt', 'r') as file:
-                res = ''
                 txt = file.read()
-                root = self.__rootNode
-                cur = root
-                for code in txt:
-                    if code == '0':
-                        if cur.char is not None:
-                            res += cur.char
-                            cur = root
 
-                        cur = cur.left
-                    else:
-                        if cur.char is not None:
-                            res += cur.char
-                            cur = root
-                        cur = cur.right
+            res = ''
+            root = self.__rootNode
+            cur = root
+            for code in txt:
+                if code == '0':
+                    if cur.char is not None:
+                        res += cur.char
+                        cur = root
 
-                res += cur.char
+                    cur = cur.left
+                else:
+                    if cur.char is not None:
+                        res += cur.char
+                        cur = root
+                    cur = cur.right
+            res += cur.char
             # print(res)
+
             with open('decoded_text.txt', 'w') as file:
                 file.write(res)
+
 
         except Exception as e:
             print('Error in decoding', e)
 
+    def decode_hamming(self):
+        try:
+            with open('hamming.txt', 'r') as file:
+                txt = file.read()
+
+            m = len(txt)
+            data = list(txt)
+
+            c, ch, j, r, er, h, parity_list, h_copy = 0, 0, 0, 0, 0, [], [], []
+
+            h = data.copy()
+            h_copy = data.copy()
+
+            for parity in range(m):
+
+                ph = (2 ** c)
+
+                if (ph == (parity + 1)):
+
+                    toXor = h[parity+1:parity + ph]
+                    if len(toXor) == 0:
+                        c += 1
+                        continue
+
+                    rs = int(toXor[0])
+
+                    for z in range(1,len(toXor)):
+                        rs = rs ^ int(toXor[z])
+
+                    parity_list.append(rs)
+                    h[parity] = rs
+                    c += 1
+            parity_list.reverse()
+            er = sum(int(parity_list[i]) * (2**i) for i in range(len(parity_list)) )
+
+            if ((er) == 0):
+                print('There is no error in the hamming code received')
+
+            elif ((er) >= len(h_copy)):
+                print('Error cannot be detected')
+
+            else:
+                print('Error is in', m-er, 'bit')
+                h_copy[m - er - 1] = str(1-int(h_copy[m - er - 1]))
+                ans = ''.join(map(str, h_copy))
+                print(ans)
+
+        except Exception as e:
+            print("Unknown error at hamming decode", e)
 
     def printNodes(self):
         try:
