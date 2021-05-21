@@ -1,6 +1,7 @@
 from collections import Counter
 import heapq
 from functools import reduce
+from random import randint
 
 
 class Node:
@@ -45,15 +46,18 @@ class Huffman:
 
     def __GenerateHamming(self, bits):
         try:
-            data = list(map(list, bits))
+            data = list(bits)
             m = len(data)
             c = 0
             j = 0
             result = []
             # m + r + 1 = 2**r , r - redunant bits, m - bits of encoded code
             r = 0
-            while m + r + 1 > pow(2, r): #Calculating number of redunant bits
+            while m + r + 1 > pow(2, r): # Calculating number of redunant bits
                 r += 1
+
+            if r == 0:
+                print(str(data))
 
             for i in range(r + m): #Adding redunant bits
                 p = (2 ** c)
@@ -61,7 +65,7 @@ class Huffman:
                     result.append(0)
                     c = c + 1
                 else:
-                    result.append(int(data[j][0]))
+                    result.append(int(data[j]))
                     j = j + 1
 
 
@@ -74,9 +78,7 @@ class Huffman:
                     binar = '0'+binar
 
                 matrix.append(list(reversed(binar)))
-
             c = 0
-            pbits = []
 
             while 2**c < m + r:
                 ans = 0
@@ -130,8 +132,12 @@ class Huffman:
 
             with open('encoded_text.txt', 'w') as fil:
                 fil.write(ans)
+            m = len(ans)
 
-            res = self.__GenerateHamming(ans)
+            res = ''
+            for i in range(0, len(ans),4):
+                res += self.__GenerateHamming(ans[i:(i+4)])
+
             with open('hamming.txt', 'w') as fil:
                 fil.write(res)
 
@@ -153,6 +159,21 @@ class Huffman:
 
         except Exception as e:
             print("Unknown error: ", e)
+
+    def __makeError(self):
+        with open('hamming.txt', 'r') as file:
+            txt = file.read()
+            txt = txt.strip()
+        res = ''
+        for i in range(0, len(txt), 7):
+            x = list(txt[i:(i + 7)])
+            l = randint(0, len(x))
+            if l != len(x):
+                x[l] = str(1 - int(x[l]))
+            res += ''.join(map(str, x))
+
+        with open('WithErrors.txt', 'w') as file:
+            file.write(res)
 
     def decode(self):
         try:
@@ -179,18 +200,30 @@ class Huffman:
 
             with open('decoded_text.txt', 'w') as file:
                 file.write(res)
+            self.__makeError()
 
+            # Error correcting of hamming
+            with open('WithErrors.txt', 'r') as file:
+                txt = file.read()
+                txt = txt.strip()
+            print(txt)
+
+            res = ''
+            for i in range(0, len(txt), 7):
+                x = list(txt[i:(i + 7)])
+                # print(x)
+                cur = self.__decode_hamming(x)
+                # print(list(cur),'\n')
+                res += cur
+            print(res)
+            with open('decoded_hamming.txt', 'w') as file:
+                file.write(res)
 
         except Exception as e:
             print('Error in decoding', e)
 
-    def decode_hamming(self):
+    def __decode_hamming(self, data):
         try:
-            with open('hamming.txt', 'r') as file:
-                bits = file.read()
-                bits = bits.strip()
-
-            data = list(bits)
             m = len(data)
             r = 0
             while 2**r < m:
@@ -203,10 +236,11 @@ class Huffman:
                 binar = bin(cur)[2:]
                 while len(binar) < r:
                     binar = '0' + binar
-                matrix.append(list(reversed(binar)))
+                matrix.append(list(binar))
 
             c = 0
             pbits = []
+
             while 2 ** c < m:
                 ans = 0
                 for i in range(m):
@@ -220,9 +254,10 @@ class Huffman:
             if error == 0:
                 print("No errors finded")
             else:
+                print('Error at: ' , error)
                 data[error-1] = str(1 - int(data[error-1]))
-                with open('decoded_hamming.txt', 'w') as file:
-                    file.write(reduce(lambda x,y: str(x)+str(y), data))
+            ans = ans = ''.join(map(str, data))
+            return ans
         except Exception as e:
             print("Unknown error at hamming decode", e)
 

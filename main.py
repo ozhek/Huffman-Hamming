@@ -1,7 +1,5 @@
 from huffman import Huffman
 
 ah = Huffman()
-
-ah.encode('hh.txt')
+ah.encode('hah.txt')
 ah.decode()
-ah.decode_hamming()
