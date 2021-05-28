@@ -148,6 +148,7 @@ class Huffman:
             res = ''
             for i in range(0, len(ans),4):
                 res += self.__GenerateHamming(ans[i:(i+4)])
+
             print("Hamming encoded: ", res)
             with open('hamming.txt', 'w') as fil:
                 fil.write(res)
@@ -168,7 +169,6 @@ class Huffman:
             self.__rootNode = root
             self.__makeCodes(root, '')
             self.__writeResult(txt)
-
         except Exception as e:
             print("Unknown error: ", e)
 
@@ -189,7 +189,11 @@ class Huffman:
 
     def decode(self):
         try:
-            with open('encoded_text.txt', 'r') as file:
+            self.__makeError()
+            self.__HammingErrorCorrection()
+            self.__HammingToHuffman()
+
+            with open('hamming_decoded.txt', 'r') as file:
                 txt = file.read()
 
             res = ''
@@ -208,11 +212,9 @@ class Huffman:
                         cur = root
                     cur = cur.right
             res += cur.char
+            print('Decoded text:', res)
             with open('decoded_text.txt', 'w') as file:
                 file.write(res)
-
-            self.__makeError()
-            self.__HammingErrorCorrection()
 
         except Exception as e:
             print('Error in decoding', e)
@@ -256,4 +258,28 @@ class Huffman:
                 file.write(res)
         except Exception as e:
             print("HammingErrorCorrection unknown error: ", e)
+
+    def __HammingToHuffman(self):
+        try:
+            with open('corrected_hamming.txt', 'r') as file:
+                txt = file.read()
+                txt = txt.strip()
+
+            final = []
+            x = []
+            for i in range(0, len(txt), 7):
+                x = list(txt[i:(i + 7)])
+                c = 0
+                for j in range(len(x)):
+                    if j + 1!= pow(2,c) :
+                        final += str(x[j])
+                    else:
+                        c += 1
+
+            res = ''.join(map(str, final))
+            print("Gained Huffman code:", res )
+            with open('hamming_decoded.txt', 'w') as file:
+                file.write(res)
+        except Exception as e:
+            print("Error at hamming to huffman", e)
 
