@@ -236,7 +236,7 @@ class Huffman:
             if error != 0:
                 data[error-1] = str(1 - int(data[error-1]))
 
-            ans = ans = ''.join(map(str, data))
+            ans = ''.join(map(str, data))
             return ans
         except Exception as e:
             print("Unknown error at hamming decode", e)
@@ -253,7 +253,9 @@ class Huffman:
                 x = list(txt[i:(i + 7)])
                 cur = self.__HammingBlockCorrection(i, x)
                 res += cur
+
             print("Corrected hamming encoded text", res)
+
             with open('corrected_hamming.txt', 'w') as file:
                 file.write(res)
         except Exception as e:
@@ -278,6 +280,7 @@ class Huffman:
 
             res = ''.join(map(str, final))
             print("Gained Huffman code:", res )
+
             with open('hamming_decoded.txt', 'w') as file:
                 file.write(res)
         except Exception as e:
