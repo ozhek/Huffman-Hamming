@@ -5,33 +5,33 @@ import random
 import math
 
 
-
-class Node:
-
-    def __init__(self, char, freq):
-        self.char = char
-        self.freq = freq
-        self.left = None
-        self.right = None
-
-    def __lt__(self, other):
-        return self.freq < other.freq
-
-    def __eq__(self, other):
-        if not other:
-            return False
-        if not isinstance(other, Node):
-            return False
-        return self.freq == other.freq
-
-    def __str__(self):
-        return self.char
 class Huffman:
 
     def __init__(self):
         self.__heap = []
         self.__rootNode = None
         self.__codes = {}
+
+    class Node:
+
+        def __init__(self, char, freq):
+            self.char = char
+            self.freq = freq
+            self.left = None
+            self.right = None
+
+        def __lt__(self, other):
+            return self.freq < other.freq
+
+        def __eq__(self, other):
+            if not other:
+                return False
+            if not isinstance(other, Node):
+                return False
+            return self.freq == other.freq
+
+        def __str__(self):
+            return self.char
 
     def __getFreq(self, txt):
         prob = Counter()
@@ -43,7 +43,7 @@ class Huffman:
     def __makeHeap(self, freq):
         try:
             for k in freq:
-                node = Node(k, freq[k])
+                node = self.Node(k, freq[k])
                 heapq.heappush(self.__heap, node)
         except Exception as e:
             print("Unknown error in makeHeap: ", e)
@@ -54,7 +54,7 @@ class Huffman:
                 node1 = heapq.heappop(self.__heap)
                 node2 = heapq.heappop(self.__heap)
 
-                merged = Node(None, node1.freq + node2.freq)
+                merged = self.Node(None, node1.freq + node2.freq)
                 merged.left = node1
                 merged.right = node2
                 heapq.heappush(self.__heap, merged)
@@ -81,12 +81,17 @@ class Huffman:
             self.__makeTree()
             root = heapq.heappop(self.__heap)
             self.__rootNode = root
-            self.__makeCodes(root, '')
+            
+            if root.char is None:
+                self.__makeCodes(root, '')
+            else:
+                self.__codes[root.char] = '0'
 
             ans = ''
             for i in txt:
                 ans += self.__codes[i]
 
+            
             with open(writeFilePath, 'w') as fil:
                 fil.write(ans)
 
@@ -107,26 +112,28 @@ class Huffman:
                         res += cur.char
                         cur = root
 
-                    cur = cur.left
+                    if cur.left:
+                        cur = cur.left
                 else:
                     if cur.char is not None:
                         res += cur.char
                         cur = root
-                    cur = cur.right
+                    
+                    if cur.right:
+                        cur = cur.right
             res += cur.char
             with open(writeFilePath, 'w') as file:
                 file.write(res)
 
         except Exception as e:
-            print('Error in decoding', e)
-
+            print('Error in huffman decoding', e)
 class Hamming:
 
 
     def makeError(self, readFilePath, writeFilePath): #makinging an error for hamming encoding
         with open(readFilePath, 'r') as file:
             txt = file.read()
-            txt = txt.strip()
+
         res = ''
         for i in range(0, len(txt), 7):
             x = list(txt[i:(i + 7)])
@@ -136,6 +143,7 @@ class Hamming:
             res += ''.join(map(str, x))
         with open(writeFilePath, 'w') as file:
             file.write(res)
+
 
     def __generateMatrix(self, m , r, revers=False):
         matrix = []
@@ -198,12 +206,15 @@ class Hamming:
             with open(readFilePath, 'r') as fil:
                 txt = fil.read()
 
+
             res = ''
             for i in range(0, len(txt), 4):
                 res += self.__GenerateHamming(txt[i:(i + 4)])
 
             with open(writeFilePath, 'w') as fil:
                 fil.write(res)
+
+            return res
         except Exception as e:
             print('hamming encode: ', e)
 
@@ -241,17 +252,17 @@ class Hamming:
                 cur = self.__HammingBlockCorrection(i, x)
                 res += cur
 
+
             with open(writeFilePath, 'w') as file:
                 file.write(res)
         except Exception as e:
             print("HammingErrorCorrection unknown error: ", e)
 
 
-    def decode(self, readFilePath, writeFilePath):
+    def decode(self, readFilePath, writeFilePath ):
         try:
             with open(readFilePath, 'r') as file:
                 txt = file.read()
-                txt = txt.strip()
 
             final = []
             x = []
@@ -266,12 +277,11 @@ class Hamming:
 
             res = ''.join(map(str, final))
 
+            
             with open(writeFilePath, 'w') as file:
                 file.write(res)
         except Exception as e:
             print("Error at huffman decode", e)
-
-
 class Encryption:
 
     def __init__(self):

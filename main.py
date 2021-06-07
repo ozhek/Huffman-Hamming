@@ -1,14 +1,17 @@
 import compression as c
+
+enc = c.Encryption()
 huf = c.Huffman()
 ham = c.Hamming()
-enc = c.Encryption()
 
-enc.Encrypt('hah.txt', 'encrypted.txt')
-huf.encode('encrypted.txt', 'huffman_encoded.txt')
-ham.encode('huffman_encoded.txt', 'hamming_encoded.txt')
-ham.makeError('hamming_encoded.txt', 'hamming_encoded_witherrors.txt')
-ham.ErrorCorrection('hamming_encoded_witherrors.txt', 'hamming_encoded_corrected.txt')
-ham.decode('hamming_encoded_corrected.txt', 'hamming_decoded.txt')
-huf.decode('hamming_decoded.txt', 'huffman_decoded.txt')
-enc.Decrypt('huffman_decoded.txt', 'decrypted.txt')
+enc.Encrypt('hh.txt', 'files/encrypted.txt')
+huf.encode('files/encrypted.txt', 'files/huffman_encoded.txt')
+ham.encode('files/huffman_encoded.txt', 'files/hamming_encoded.txt')
+
+ham.makeError('files/hamming_encoded.txt', 'files/hamming_encoded_with_errors.txt')
+
+ham.ErrorCorrection('files/hamming_encoded_with_errors.txt', 'files/hamming_encoded_corrected.txt')
+ham.decode('files/hamming_encoded_corrected.txt', 'files/hamming_decoded.txt')
+huf.decode('files/hamming_decoded.txt', 'files/huffman_decoded')
+enc.Decrypt('files/huffman_decoded', 'files/decrypted')
 
